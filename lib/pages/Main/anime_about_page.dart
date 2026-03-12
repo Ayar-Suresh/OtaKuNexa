@@ -836,7 +836,7 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
               if (_isAvailable && _foundAnimeData != null)
                 _buildTelegramTutorial(),
 
-              SizedBox(height: 100.h),
+              SizedBox(height: 70.h),
             ]),
           ),
         ],
@@ -968,12 +968,15 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
   // ---------------------------------------------------------------------------
   Widget _buildTelegramTutorial() {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+      margin: EdgeInsets.symmetric(horizontal: 13.w, vertical: 2.h),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E2A),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.deepPurple.withOpacity(0.5), width: 1.5),
+        border: Border.all(
+          color: Colors.deepPurple.withOpacity(0.5),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.deepPurple.withOpacity(0.2),
@@ -1004,38 +1007,47 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
           SizedBox(height: 8.h),
           Text(
             "Follow these simple steps to get your episodes directly via Telegram. Don't worry, it's super easy!",
-            style: TextStyle(color: Colors.grey[400], fontSize: 13.sp, height: 1.4),
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 13.sp,
+              height: 1.4,
+            ),
           ),
           SizedBox(height: 20.h),
           _buildTutorialStep(
             stepNumber: "1",
             icon: Icons.list_alt,
             title: "Select your Batch",
-            description: "Tap on 'Batch 1' (or any batch) above to select the episodes you want to download (e.g., Ep 1-10).",
+            description:
+                "Tap on 'Batch 1' (or any batch) above to select the episodes you want to download (e.g., Ep 1-10).",
           ),
           _buildTutorialStep(
             stepNumber: "2",
             icon: Icons.ads_click,
             title: "Click 'Okay, I'll help!'",
-            description: "A prompt will appear. Simply click the 'Okay, I'll help!' button to proceed.",
+            description:
+                "A prompt will appear. Simply click the 'Okay, I'll help!' button to proceed.",
           ),
           _buildTutorialStep(
             stepNumber: "3",
             icon: Icons.timer,
             title: "Wait 10 Seconds",
-            description: "You'll be directed to a sponsor page. It's mandatory to wait there for at least 10 seconds. We appreciate your support!",
+            description:
+                "You'll be directed to a sponsor page. It's mandatory to wait there for at least 10 seconds. We appreciate your support!",
           ),
           _buildTutorialStep(
             stepNumber: "4",
             icon: Icons.arrow_back,
             title: "Press the Back Button",
-            description: "After 10 seconds have passed, just press your device's back button.",
+            description:
+                "After 10 seconds have passed, just press your device's back button.",
           ),
           _buildTutorialStep(
             stepNumber: "5",
             icon: Icons.telegram,
             title: "Boom! Get Your Files",
-            description: "You will automatically be redirected to our Telegram bot with all your files ready! Note: If it's your first time, you may need to subscribe to the main OtakuNexa update channel first.",
+            description:
+                "You will automatically be redirected to our Telegram bot with all your files ready! Note: If it's your first time, you may need to subscribe to the main OtakuNexa update channel first.",
             isLast: true,
           ),
         ],
@@ -1066,7 +1078,11 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
                 child: Center(
                   child: Text(
                     stepNumber,
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                    ),
                   ),
                 ),
               ),
@@ -1093,7 +1109,11 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
                       Expanded(
                         child: Text(
                           title,
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15.sp,
+                          ),
                         ),
                       ),
                     ],
@@ -1101,7 +1121,11 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
                   SizedBox(height: 6.h),
                   Text(
                     description,
-                    style: TextStyle(color: Colors.grey[400], fontSize: 13.sp, height: 1.4),
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 13.sp,
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),
