@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "913251567889",
+    "project_id": "otakunexa-anime",
+    "storage_bucket": "otakunexa-anime.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913251567889:android:249e5cc60ef49d789d64b0",
+        "android_client_info": {
+          "package_name": "com.watch.otakunexa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABo-bY-1H0gALG0bpf0ugWZkmbVjnemTw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
