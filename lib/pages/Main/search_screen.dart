@@ -11,6 +11,7 @@ import 'package:otakunexa/Youtube/Playlist/service/youtube_offline_playlist.dart
 import 'package:otakunexa/Youtube/Playlist/youtube_anime_details.dart';
 import 'package:otakunexa/pages/Main/anime_about_page.dart';
 import 'package:otakunexa/OuterShores/teleg/teleg_service.dart';
+import 'package:otakunexa/services/sassy_ai_service.dart';
 import 'package:shimmer/shimmer.dart';
 
 // Unified Search Result Model
@@ -90,6 +91,9 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    SassyAiService.instance.activeSearchController = _searchController;
+    SassyAiService.instance.activeSearchCallback = _onSearchChanged;
+    
     _scrollController.addListener(_onScroll);
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) _searchFocusNode.requestFocus();
@@ -110,6 +114,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void dispose() {
+    SassyAiService.instance.activeSearchController = null;
+    SassyAiService.instance.activeSearchCallback = null;
     _debounceTimer?.cancel();
     _searchController.dispose();
     _scrollController.dispose();
@@ -267,6 +273,20 @@ class _SearchScreenState extends State<SearchScreen> {
       
       if (_searchResults.isEmpty) {
         _errorMessage = 'No results found';
+        if (SassyAiService.instance.isGhostNavigating) {
+          SassyAiService.instance.isGhostNavigating = false;
+          SassyAiService.instance.handleGhostAutomationResult(false);
+        }
+      } else if (SassyAiService.instance.isGhostNavigating) {
+        final firstItem = _searchResults.first;
+        if (firstItem.type == SearchResultType.anime && firstItem.anime != null) {
+          // DO NOT disable isGhostNavigating here. Let AnimeAboutPage handle it!
+          SassyAiService.instance.handleGhostAutomationResult(firstItem.isAvailable);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AnimeAboutPage(selectedAnime: firstItem.anime!)));
+        } else {
+          SassyAiService.instance.isGhostNavigating = false;
+          SassyAiService.instance.handleGhostAutomationResult(false);
+        }
       }
     });
   }

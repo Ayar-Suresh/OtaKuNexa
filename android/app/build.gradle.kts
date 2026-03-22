@@ -10,8 +10,7 @@ plugins {
 
 android {
     namespace = "com.watch.otakunexa"
-    compileSdk = 36 
-    ndkVersion = "27.0.12077973"
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -24,7 +23,7 @@ android {
 
     defaultConfig {
         applicationId = "com.watch.otakunexa"
-        minSdk = 23             
+        minSdk = 23
         targetSdk = 35 
         versionCode = flutter.versionCode
         versionName = flutter.versionName

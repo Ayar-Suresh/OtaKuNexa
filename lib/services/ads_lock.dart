@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:otakunexa/services/sassy_ai_service.dart';
 
 class AdWaitDialog extends StatefulWidget {
   final VoidCallback onComplete;
@@ -20,6 +21,7 @@ class _AdWaitDialogState extends State<AdWaitDialog> {
   void initState() {
     super.initState();
     _startTime = DateTime.now();
+    SassyAiService.instance.triggerAdRoast();
 
     // Timer checks every 500ms to be accurate even if app is backgrounded
     _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {

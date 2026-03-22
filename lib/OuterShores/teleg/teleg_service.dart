@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
+import 'package:showcaseview/showcaseview.dart';
+import 'package:otakunexa/services/sassy_ai_service.dart';
 
 // =============================================================================
 // 🧠 LOGIC CLASS: ANIME DOWNLOAD SERVICE
@@ -546,12 +548,16 @@ class AnimeDownloadWidget extends StatefulWidget {
   final Map<String, dynamic> animeData;
   final String titleKey;
   final Function(String selectedSeason) onSeasonChanged;
+  final GlobalKey? languageKey;
+  final GlobalKey? batchKey;
 
   const AnimeDownloadWidget({
     super.key,
     required this.animeData,
     required this.titleKey,
     required this.onSeasonChanged,
+    this.languageKey,
+    this.batchKey,
   });
 
   @override
@@ -794,6 +800,22 @@ class _AnimeDownloadWidgetState extends State<AnimeDownloadWidget>
       return numA.compareTo(numB);
     });
 
+    // 🔥 GHOST AUTOMATION EXECUTION
+    if (SassyAiService.instance.isGhostNavigating && standardBatchKeys.isNotEmpty) {
+      SassyAiService.instance.isGhostNavigating = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Wait for the scrolling animation from AnimeAboutPage to finish
+        Future.delayed(const Duration(milliseconds: 1400), () {
+          if (mounted) {
+            SassyAiService.instance.showMessage(
+              "now i cant help after this you are going to redirect direct link which makes some money for me and i get motivated to emprove otakunexa and provide you more content so in there you have stay 10 sec and then press back you are automatically going to redirect telegram bot after you press back button and enjoy you anime without frustration ✨",
+            );
+            _handleDownloadFlow(standardBatchKeys.first);
+          }
+        });
+      });
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
@@ -973,9 +995,12 @@ class _AnimeDownloadWidgetState extends State<AnimeDownloadWidget>
               !(_availableLanguages.length == 1 &&
                   _availableLanguages[0] == "Default")) ...[
             SizedBox(height: 16.h),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
+            Showcase(
+              key: widget.languageKey ?? GlobalKey(),
+              description: 'Select your language (Sub/Dub)',
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
               child: Row(
                 children: _availableLanguages.map((lang) {
                   bool isSelected = _selectedLanguage == lang;
@@ -1053,6 +1078,7 @@ class _AnimeDownloadWidgetState extends State<AnimeDownloadWidget>
                 }).toList(),
               ),
             ),
+            ),
           ],
 
           SizedBox(height: 20.h),
@@ -1082,9 +1108,12 @@ class _AnimeDownloadWidgetState extends State<AnimeDownloadWidget>
               ),
             ),
 
-          Wrap(
-            spacing: 12.w,
-            runSpacing: 12.h,
+          Showcase(
+            key: widget.batchKey ?? GlobalKey(),
+            description: 'Tap a batch to download',
+            child: Wrap(
+              spacing: 12.w,
+              runSpacing: 12.h,
             children: [
               ...standardBatchKeys.map((batchKey) {
                 int count = (batches[batchKey] as List).length;
@@ -1118,6 +1147,7 @@ class _AnimeDownloadWidgetState extends State<AnimeDownloadWidget>
                   () => _handleDownloadFlow("Special_1"),
                 ),
             ],
+          ),
           ),
           SizedBox(height: 100.h),
         ],

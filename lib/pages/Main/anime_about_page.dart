@@ -5,6 +5,7 @@ import 'package:otakunexa/OuterShores/model/metadate_model.dart';
 import 'package:otakunexa/OuterShores/teleg/teleg_service.dart';
 import 'package:otakunexa/pages/Library/req_and_supply.dart';
 import 'package:otakunexa/pages/Others/share/share_service.dart';
+import 'package:otakunexa/services/sassy_ai_service.dart';
 
 // Import your service file here
 // import 'path/to/anime_download_service.dart';
@@ -33,10 +34,19 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
 
   // 🚦 NEW: Visibility State for Button
   bool _showSwitchButton = false;
+  
+  final GlobalKey _languageKey = GlobalKey();
+  final GlobalKey _downloadKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    // Give SassyBot Context
+    SassyAiService.instance.currentAnimeContext = widget.selectedAnime.data.title;
+
+    // Trigger SassyBot Roast
+    SassyAiService.instance.triggerAnimeRoast(widget.selectedAnime.data.titleEnglish);
+
     // Delay fetch to ensure 'context' is valid
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _fetchData();
@@ -69,10 +79,24 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
     if (mounted) {
       setState(() {
         _isLoadingIndex = false;
+        SassyAiService.instance.isCurrentAnimeAvailable = result != null;
         if (result != null) {
           _isAvailable = true;
           _foundAnimeData = result['data'];
           _animeTitleKey = result['titleKey'];
+
+          // Ghost Automation: Scroll to batches physically 
+          if (SassyAiService.instance.isGhostNavigating) {
+            Future.delayed(const Duration(milliseconds: 600), () {
+              if (mounted) {
+                _scrollController.animateTo(
+                  _scrollController.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 900),
+                  curve: Curves.easeInOutBack,
+                );
+              }
+            });
+          }
 
           // Extract Language Logic
           if (_foundAnimeData != null && _foundAnimeData!['seasons'] != null) {
@@ -825,6 +849,8 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
                 AnimeDownloadWidget(
                   animeData: _foundAnimeData!,
                   titleKey: _animeTitleKey!,
+                  languageKey: _languageKey,
+                  batchKey: _downloadKey,
                   onSeasonChanged: (val) {
                     setState(() => _currentSelectedSeason = val);
                   },
@@ -846,6 +872,8 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
 
   @override
   void dispose() {
+    SassyAiService.instance.currentAnimeContext = null;
+    SassyAiService.instance.isCurrentAnimeAvailable = null;
     _scrollController.dispose();
     super.dispose();
   }
