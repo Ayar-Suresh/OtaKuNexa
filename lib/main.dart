@@ -51,11 +51,13 @@ class MyApp extends StatelessWidget {
           ),
           builder: (context, child) {
             SassyAiService.instance.navigatorKey = navigatorKey;
-            return ShowCaseWidget(
-              builder: (context) => Stack(
-                children: [
-                  if (child != null) child,
-                  const SassyBotUI(),
+            return Directionality(
+              textDirection: TextDirection.ltr,
+              child: Overlay(
+                initialEntries: [
+                  if (child != null)
+                    OverlayEntry(builder: (context) => ShowCaseWidget(builder: (context) => child)),
+                  OverlayEntry(builder: (context) => const SassyBotUI()),
                 ],
               ),
             );

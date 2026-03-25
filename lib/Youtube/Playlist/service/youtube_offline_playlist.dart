@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
 import 'package:otakunexa/Youtube/Playlist/models/youtube_playlist_model.dart';
 
 class PlaylistService {
@@ -65,6 +66,21 @@ class PlaylistService {
     print('🔀 Playlists have been reshuffled!');
   }
 
+  // 🔥 UPDATE 3: Helper to test if playlist is available via its thumbnail
+  static Future<bool> _isPlaylistAvailable(YoutubePlaylist playlist) async {
+    if (playlist.thumbnail.isEmpty) return false;
+    try {
+      final response = await http
+          .head(Uri.parse(playlist.thumbnail))
+          .timeout(const Duration(seconds: 3));
+      return response.statusCode != 404;
+    } catch (_) {
+      // If network fails (e.g. timeout or no internet), assume true 
+      // so we don't accidentally wipe offline caches
+      return true;
+    }
+  }
+
   // Get batches of data
   static Future<List<YoutubePlaylist>> getPlaylistsBatch({
     required int startIndex,
@@ -74,16 +90,32 @@ class PlaylistService {
       await _initialize();
     }
 
-    final endIndex = startIndex + batchSize;
-    if (startIndex >= _allPlaylists.length) {
-      return [];
+    final List<YoutubePlaylist> validBatch = [];
+    int i = startIndex;
+
+    while (validBatch.length < batchSize && i < _allPlaylists.length) {
+      int remainingNeeded = batchSize - validBatch.length;
+      int endIndex = i + remainingNeeded;
+      if (endIndex > _allPlaylists.length) endIndex = _allPlaylists.length;
+
+      final chunk = _allPlaylists.sublist(i, endIndex);
+      
+      final futures = chunk.map((p) => _isPlaylistAvailable(p));
+      final results = await Future.wait(futures);
+
+      int chunkOffset = 0;
+      for (int r = 0; r < results.length; r++) {
+        if (results[r]) {
+          validBatch.add(chunk[r]);
+          chunkOffset++;
+        } else {
+          _allPlaylists.removeAt(i + chunkOffset);
+        }
+      }
+      i += chunkOffset;
     }
 
-    final actualEndIndex = endIndex > _allPlaylists.length
-        ? _allPlaylists.length
-        : endIndex;
-
-    return _allPlaylists.sublist(startIndex, actualEndIndex);
+    return validBatch;
   }
 
   // Get total count
@@ -115,16 +147,33 @@ class PlaylistService {
         )
         .toList();
 
-    final endIndex = startIndex + batchSize;
-    if (startIndex >= filteredPlaylists.length) {
-      return [];
+    final List<YoutubePlaylist> validBatch = [];
+    int i = startIndex;
+
+    while (validBatch.length < batchSize && i < filteredPlaylists.length) {
+      int remainingNeeded = batchSize - validBatch.length;
+      int endIndex = i + remainingNeeded;
+      if (endIndex > filteredPlaylists.length) endIndex = filteredPlaylists.length;
+
+      final chunk = filteredPlaylists.sublist(i, endIndex);
+      
+      final futures = chunk.map((p) => _isPlaylistAvailable(p));
+      final results = await Future.wait(futures);
+
+      int chunkOffset = 0;
+      for (int r = 0; r < results.length; r++) {
+        if (results[r]) {
+          validBatch.add(chunk[r]);
+          chunkOffset++;
+        } else {
+          _allPlaylists.removeWhere((p) => p.id == chunk[r].id);
+          filteredPlaylists.removeAt(i + chunkOffset);
+        }
+      }
+      i += chunkOffset;
     }
 
-    final actualEndIndex = endIndex > filteredPlaylists.length
-        ? filteredPlaylists.length
-        : endIndex;
-
-    return filteredPlaylists.sublist(startIndex, actualEndIndex);
+    return validBatch;
   }
 
   static Future<int> getSearchCount(String query) async {

@@ -6,7 +6,6 @@ import 'package:otakunexa/services/sassy_ai_service.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SassyBotUI — Modern Anime-Style Chat Overlay
-// No audio / TTS — pure text chat with typewriter animation
 // ─────────────────────────────────────────────────────────────────────────────
 class SassyBotUI extends StatefulWidget {
   const SassyBotUI({super.key});
@@ -34,6 +33,8 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
   Timer? _typewriterTimer;
   String _targetMessage = '';
 
+  bool get _isTyping => _displayedMessage != _targetMessage;
+
   @override
   void initState() {
     super.initState();
@@ -54,15 +55,20 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
 
   void _onNewMessage() {
     final msg = SassyAiService.instance.currentMessage.value;
-    if (msg == _targetMessage) return; // Only process if the message actually changed
+    if (msg == _targetMessage)
+      return; // Only process if the message actually changed
     _startTypewriter(msg);
   }
 
   void _startTypewriter(String text) {
     _typewriterTimer?.cancel();
     _targetMessage = text;
-    _displayedMessage = text.isNotEmpty ? text[0] : ''; // Prevent empty string glitches
     
+    final runes = text.runes.toList();
+    _displayedMessage = runes.isNotEmpty
+        ? String.fromCharCode(runes[0])
+        : ''; // Prevent empty string glitches
+
     // Immediately show first character
     if (mounted && text.isNotEmpty) {
       setState(() {});
@@ -75,15 +81,21 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
         t.cancel();
         return;
       }
-      if (index < _targetMessage.length) {
+      if (index < runes.length) {
+        // Capture index locally to prevent RangeError during deferred execution
+        final int currentIndex = index;
+
         // Safe setState mechanism to avoid during-build exceptions
         final applyState = () {
           if (mounted) {
-            setState(() => _displayedMessage = _targetMessage.substring(0, index + 1));
+            setState(
+              () => _displayedMessage = String.fromCharCodes(runes.sublist(0, currentIndex + 1)),
+            );
           }
         };
-        
-        if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+
+        if (SchedulerBinding.instance.schedulerPhase ==
+            SchedulerPhase.persistentCallbacks) {
           SchedulerBinding.instance.addPostFrameCallback((_) => applyState());
         } else {
           applyState();
@@ -141,7 +153,8 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
                 child: isExpanded
                     ? _buildExpandedChat()
                     : GestureDetector(
-                        onPanUpdate: (d) => setState(() => _position += d.delta),
+                        onPanUpdate: (d) =>
+                            setState(() => _position += d.delta),
                         onTap: () {
                           if (!SassyAiService.instance.isExpanded.value) {
                             SassyAiService.instance.isExpanded.value = true;
@@ -182,10 +195,11 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: (isThinking
-                              ? const Color(0xFF9D4EDD)
-                              : const Color(0xFFFF5C8D))
-                          .withOpacity(0.55),
+                      color:
+                          (isThinking
+                                  ? const Color(0xFF9D4EDD)
+                                  : const Color(0xFFFF5C8D))
+                              .withOpacity(0.55),
                       blurRadius: 18.r,
                       spreadRadius: 2.r,
                     ),
@@ -266,58 +280,65 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-        Row(children: [
-          // Status dot
-          ValueListenableBuilder<bool>(
-            valueListenable: SassyAiService.instance.isThinking,
-            builder: (_, isThinking, __) => AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: 10.w,
-              height: 10.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isThinking
-                    ? const Color(0xFFFFD700)
-                    : const Color(0xFF44FF88),
-                boxShadow: [
-                  BoxShadow(
-                    color: (isThinking
-                            ? const Color(0xFFFFD700)
-                            : const Color(0xFF44FF88))
-                        .withOpacity(0.8),
-                    blurRadius: 6.r,
+            Row(
+              children: [
+                // Status dot
+                ValueListenableBuilder<bool>(
+                  valueListenable: SassyAiService.instance.isThinking,
+                  builder: (_, isThinking, __) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 10.w,
+                    height: 10.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isThinking
+                          ? const Color(0xFFFFD700)
+                          : const Color(0xFF44FF88),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              (isThinking
+                                      ? const Color(0xFFFFD700)
+                                      : const Color(0xFF44FF88))
+                                  .withOpacity(0.8),
+                          blurRadius: 6.r,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'SassyBot ✨',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15.sp,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+            // Close
+            GestureDetector(
+              onTap: () => SassyAiService.instance.isExpanded.value = false,
+              child: Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: Colors.white54,
+                  size: 16.sp,
+                ),
               ),
             ),
-          ),
-          SizedBox(width: 8.w),
-          Text(
-            'SassyBot ✨',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: 15.sp,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ]),
-        // Close
-        GestureDetector(
-          onTap: () => SassyAiService.instance.isExpanded.value = false,
-          child: Container(
-            padding: EdgeInsets.all(4.w),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.close_rounded, color: Colors.white54, size: 16.sp),
-          ),
+          ],
         ),
-      ],
-     ),
-    ),
-   );
+      ),
+    );
   }
 
   // ─── Message Bubble with Typewriter ─────────────────────────────────────────
@@ -363,7 +384,11 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.auto_awesome, size: 14.sp, color: const Color(0xFFE0AAFF)),
+            Icon(
+              Icons.auto_awesome,
+              size: 14.sp,
+              color: const Color(0xFFE0AAFF),
+            ),
             SizedBox(width: 6.w),
             Text(
               'thinking${['...', '.. ', '.  '][phase % 3]}',
@@ -455,17 +480,19 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
                 return Row(
                   children: [
                     Expanded(
-                      child: TextField(
-                        controller: _inputController,
-                        focusNode: _inputFocusNode,
-                        enabled: !isThinking,
-                        style: TextStyle(color: Colors.white, fontSize: 13.sp),
+                      child: SizedBox(
+                        height: 45.h,
+                        child: TextField(
+                          controller: _inputController,
+                          focusNode: _inputFocusNode,
+                          enabled: !isThinking && !_isTyping,
+                          style: TextStyle(color: Colors.white, fontSize: 13.sp),
                         decoration: InputDecoration(
                           hintText: isThinking
                               ? 'SassyBot is thinking...'
                               : waitingForAnime
-                                  ? 'Enter anime title... 🔍'
-                                  : 'Ask me anything... 💬',
+                              ? 'Enter anime title... 🔍'
+                              : 'Ask me anything... 💬',
                           hintStyle: TextStyle(
                             color: Colors.white38,
                             fontSize: 13.sp,
@@ -497,8 +524,9 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
                         onSubmitted: (_) => _submitInput(),
                       ),
                     ),
-                    SizedBox(width: 8.w),
-                    GestureDetector(
+                  ),
+                  SizedBox(width: 8.w),
+                  GestureDetector(
                       onTap: isThinking ? null : _submitInput,
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
@@ -517,8 +545,9 @@ class _SassyBotUIState extends State<SassyBotUI> with TickerProviderStateMixin {
                               ? []
                               : [
                                   BoxShadow(
-                                    color: const Color(0xFFFF5C8D)
-                                        .withOpacity(0.5),
+                                    color: const Color(
+                                      0xFFFF5C8D,
+                                    ).withOpacity(0.5),
                                     blurRadius: 10.r,
                                   ),
                                 ],

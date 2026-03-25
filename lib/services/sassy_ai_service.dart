@@ -179,6 +179,10 @@ IMPORTANT FORMATTING RULES:
   Future<void> triggerConfusionFlow({bool force = false}) async {
     if (!force && _hasShownHelp) return; // Only show automatically ONCE per session
     if (!force && _confusionCooldown) return;
+    
+    // Do not interrupt the user if they are already interacting with SassyBot
+    if (!force && (isVisible.value || isExpanded.value)) return;
+    
     if (isWaitingForHelpResponse.value) return;
     if (isWaitingForAnimeInput.value) return;
     if (isThinking.value) return;
@@ -214,8 +218,9 @@ IMPORTANT FORMATTING RULES:
 
       if (activeSearchController != null) {
         activeSearchController!.clear();
-        for (int i = 0; i < query.length; i++) {
-          activeSearchController!.text += query[i];
+        final runes = query.runes.toList();
+        for (int i = 0; i < runes.length; i++) {
+          activeSearchController!.text += String.fromCharCode(runes[i]);
           await Future.delayed(const Duration(milliseconds: 150));
         }
         if (activeSearchCallback != null) {

@@ -7,6 +7,8 @@ import 'package:otakunexa/pages/Library/req_and_supply.dart';
 import 'package:otakunexa/pages/Others/share/share_service.dart';
 import 'package:otakunexa/services/sassy_ai_service.dart';
 
+import 'package:showcaseview/showcaseview.dart';
+
 // Import your service file here
 // import 'path/to/anime_download_service.dart';
 
@@ -823,10 +825,11 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      bottomNavigationBar: _buildStickyBottomButton(),
-      body: CustomScrollView(
+    return ShowCaseWidget(
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.black,
+        bottomNavigationBar: _buildStickyBottomButton(),
+        body: CustomScrollView(
         controller: _scrollController,
         slivers: [
           _buildSliverHeader(),
@@ -866,6 +869,7 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
             ]),
           ),
         ],
+      ),
       ),
     );
   }

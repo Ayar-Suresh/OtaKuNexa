@@ -76,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> _loadVideos() async {
     await _videoController.initialize();
+    if (!mounted) return;
     setState(() => _isLoadingVideos = false);
   }
 
@@ -97,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen>
       // 1. Wipe RAM Cache in CategoryManager
       _categoryManager.hardReset();
       // 2. Reload everything
+      if (!mounted) return;
       setState(() {
         _isCategoriesLoading = true;
       });
@@ -105,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _loadCategories() async {
+    if (!mounted) return;
     setState(() {
       _isCategoriesLoading = true;
     });
@@ -118,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _loadPlaylists() async {
+    if (!mounted) return;
     setState(() {
       _isLoadingPlaylists = true;
     });
@@ -160,7 +164,13 @@ class _HomeScreenState extends State<HomeScreen>
       return;
     }
 
-    setState(() => _isLoadingMore = true);
+    if (!mounted) return;
+    
+    // Defer the state update to avoid "setState() called during build" 
+    // when the keyboard resizes the viewport and triggers a layout pass.
+    Future.microtask(() {
+      if (mounted) setState(() => _isLoadingMore = true);
+    });
 
     try {
       int nextIndex = _displayedPlaylists.length;
@@ -175,9 +185,11 @@ class _HomeScreenState extends State<HomeScreen>
           _isLoadingMore = false;
         });
       } else {
-        setState(() {
-          _isLoadingMore = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoadingMore = false;
+          });
+        }
       }
     } catch (e) {
       print('Error loading more playlists: $e');
@@ -355,6 +367,7 @@ class _HomeScreenState extends State<HomeScreen>
             onPageChanged: (index) async {
               if (index >= videos.length - 3) {
                 await _videoController.loadMore();
+                if (!mounted) return;
                 setState(() {});
               }
             },
@@ -1122,9 +1135,10 @@ class _AnimatedRecommendationState extends State<AnimatedRecommendation> {
 
       if (_isTyping) {
         final fullText = widget.recommendations[_currentIndex];
-        if (_charIndex < fullText.length) {
+        final runes = fullText.runes.toList();
+        if (_charIndex < runes.length) {
           _charIndex++;
-          _displayedText = fullText.substring(0, _charIndex);
+          _displayedText = String.fromCharCodes(runes.sublist(0, _charIndex));
           setState(() {});
         } else {
           _isTyping = false;
@@ -1145,12 +1159,12 @@ class _AnimatedRecommendationState extends State<AnimatedRecommendation> {
         return;
       }
 
+      final fullText = widget.recommendations[_currentIndex];
+      final runes = fullText.runes.toList();
+
       if (_charIndex > 0) {
         _charIndex--;
-        _displayedText = widget.recommendations[_currentIndex].substring(
-          0,
-          _charIndex,
-        );
+        _displayedText = String.fromCharCodes(runes.sublist(0, _charIndex));
         setState(() {});
       } else {
         _typingTimer.cancel();
