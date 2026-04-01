@@ -1,6 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Added Import
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:otakunexa/pages/Library/req_and_supply.dart';
 import 'package:otakunexa/pages/Main/aurapoint.dart';
@@ -278,12 +279,17 @@ class _AnimeProfilePageState extends State<AnimeProfilePage>
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [_primaryColor.withOpacity(0.2), _backgroundColor],
+        background: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [_primaryColor.withOpacity(0.4), _backgroundColor.withOpacity(0.8)],
+                ),
+              ),
             ),
           ),
         ),
@@ -574,9 +580,16 @@ class _AnimeProfilePageState extends State<AnimeProfilePage>
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF151515),
+        color: const Color(0xFF1E1E1E).withOpacity(0.5),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blueAccent.withOpacity(0.1),
+            blurRadius: 15.r,
+            offset: Offset(0, 5.h),
+          ),
+        ],
       ),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
@@ -620,11 +633,18 @@ class _AnimeProfilePageState extends State<AnimeProfilePage>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withOpacity(0.15),
+            blurRadius: 15.r,
+            offset: Offset(0, 5.h),
+          ),
+        ],
       ),
       child: Container(
         padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF101010),
+          color: const Color(0xFF1E1E1E).withOpacity(0.6),
           borderRadius: BorderRadius.circular(15.r),
         ),
         child: Row(
@@ -1043,13 +1063,13 @@ class _AnimeProfilePageState extends State<AnimeProfilePage>
         height: 76.h, // ⬅️ slightly taller
         padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF151515),
+          color: const Color(0xFF1E1E1E).withOpacity(0.5),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(color: Colors.white.withOpacity(0.05)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10.r,
+              color: color.withOpacity(0.15),
+              blurRadius: 15.r,
               offset: Offset(0, 4.h),
             ),
           ],

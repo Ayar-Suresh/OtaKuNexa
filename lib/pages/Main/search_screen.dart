@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -591,13 +592,38 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
-      body: Column(
+      body: Stack(
         children: [
-          _buildSearchBar(),
-          _buildCategoryChips(),
-          Expanded(child: _buildBody()),
+          // Ambient Glow
+          Positioned(
+            top: 100.h,
+            left: -100.w,
+            child: Container(
+              width: 300.w,
+              height: 300.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF7C4DFF).withOpacity(0.12),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                _buildSearchBar(),
+                _buildCategoryChips(),
+                Expanded(child: _buildBody()),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -699,13 +725,30 @@ class _SearchScreenState extends State<SearchScreen> {
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
-      backgroundColor: const Color(0xFF0F0F0F),
+      backgroundColor: Colors.transparent,
+      flexibleSpace: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+          child: Container(
+            color: const Color(0xFF0F0F0F).withOpacity(0.7),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withOpacity(0.05),
+                  width: 1.h,
+                )
+              )
+            ),
+          ),
+        ),
+      ),
       leading: IconButton(
         icon: Container(
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white.withOpacity(0.1),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
           child: Icon(
             Icons.arrow_back_ios_new,
@@ -732,51 +775,57 @@ class _SearchScreenState extends State<SearchScreen> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(16.r),
+        color: const Color(0xFF1E1E1E).withOpacity(0.6),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10.r,
+            color: const Color(0xFF9D4EDD).withOpacity(0.15),
+            blurRadius: 15.r,
             offset: Offset(0, 4.h),
           ),
         ],
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.w),
       ),
-      child: TextField(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
-        onChanged: _onSearchChanged,
-        style: TextStyle(color: Colors.white, fontSize: 16.sp),
-        cursorColor: const Color(0xFF9D4EDD),
-        decoration: InputDecoration(
-          hintText: 'Search anime (e.g. "One Piece")',
-          hintStyle: TextStyle(
-            color: Colors.white.withOpacity(0.3),
-            fontSize: 14.sp,
-          ),
-          prefixIcon: Icon(
-            Icons.search_rounded,
-            color: const Color(0xFF9D4EDD).withOpacity(0.8),
-            size: 24.sp,
-          ),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: Icon(
-                    Icons.close_rounded,
-                    color: Colors.white54,
-                    size: 20.sp,
-                  ),
-                  onPressed: () {
-                    _searchController.clear();
-                    _onSearchChanged('');
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 20.w,
-            vertical: 16.h,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20.r),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextField(
+            controller: _searchController,
+            focusNode: _searchFocusNode,
+            onChanged: _onSearchChanged,
+            style: TextStyle(color: Colors.white, fontSize: 16.sp),
+            cursorColor: const Color(0xFF9D4EDD),
+            decoration: InputDecoration(
+              hintText: 'Search anime (e.g. "One Piece")',
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.3),
+                fontSize: 14.sp,
+              ),
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                color: const Color(0xFF9D4EDD).withOpacity(0.8),
+                size: 24.sp,
+              ),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Colors.white54,
+                        size: 20.sp,
+                      ),
+                      onPressed: () {
+                        _searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    )
+                  : null,
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 16.h,
+              ),
+            ),
           ),
         ),
       ),
@@ -915,17 +964,21 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 5.h),
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 12.r,
+                    offset: Offset(0, 6.h),
                   ),
                 ],
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1.w,
+                ),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(20.r),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -957,10 +1010,10 @@ class _SearchScreenState extends State<SearchScreen> {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.1),
-                              Colors.black.withOpacity(0.8),
+                              Colors.black.withOpacity(0.2),
+                              Colors.black.withOpacity(0.95),
                             ],
-                            stops: const [0.5, 0.8, 1.0],
+                            stops: const [0.5, 0.75, 1.0],
                           ),
                         ),
                       ),
@@ -1144,17 +1197,21 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 5.h),
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 12.r,
+                    offset: Offset(0, 6.h),
                   ),
                 ],
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1.w,
+                ),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(20.r),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -1186,10 +1243,10 @@ class _SearchScreenState extends State<SearchScreen> {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.1),
-                              Colors.black.withOpacity(0.8),
+                              Colors.black.withOpacity(0.2),
+                              Colors.black.withOpacity(0.95),
                             ],
-                            stops: const [0.5, 0.8, 1.0],
+                            stops: const [0.5, 0.75, 1.0],
                           ),
                         ),
                       ),

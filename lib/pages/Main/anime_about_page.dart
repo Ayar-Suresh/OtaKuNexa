@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -199,13 +200,13 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.3),
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.6),
-                    Colors.black.withOpacity(0.9),
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.7),
+                    Colors.black.withOpacity(0.95),
                     Colors.black,
                   ],
-                  stops: const [0.0, 0.3, 0.6, 0.85, 1.0],
+                  stops: const [0.0, 0.4, 0.7, 0.9, 1.0],
                 ),
               ),
             ),
@@ -577,8 +578,14 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
   }
 
   Widget _buildProfessionalDetails() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E).withOpacity(0.4),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -590,7 +597,7 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 16.h),
           _buildDynamicDetailRow(
             'Studio',
             widget.selectedAnime.data.studios.isNotEmpty
@@ -623,11 +630,19 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
       height: 100.h,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.purple[900]!, Colors.blue[900]!],
+          colors: [const Color(0xFF9D4EDD).withOpacity(0.4), const Color(0xFF7B2CBF).withOpacity(0.2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF9D4EDD).withOpacity(0.15),
+            blurRadius: 15.r,
+            offset: Offset(0, 5.h),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFF9D4EDD).withOpacity(0.5), width: 1.w),
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Stack(
         children: [
@@ -702,24 +717,27 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
   }
 
   Widget _buildStickyBottomButton() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        20.w,
-        20.h,
-        20.w,
-        MediaQuery.of(context).padding.bottom + 20.h,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        border: Border(top: BorderSide(color: Colors.grey[900]!)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.8),
-            offset: Offset(0, -10.h),
-            blurRadius: 20.r,
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+            20.w,
+            20.h,
+            20.w,
+            MediaQuery.of(context).padding.bottom + 20.h,
           ),
-        ],
-      ),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1), width: 1.h)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF9D4EDD).withOpacity(0.05),
+                offset: Offset(0, -10.h),
+                blurRadius: 20.r,
+              ),
+            ],
+          ),
       child: ElevatedButton(
         onPressed: _isAvailable
             ? () {
@@ -767,8 +785,10 @@ class _AnimeAboutPageState extends State<AnimeAboutPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   // ---------------------------------------------------------------------------
   // 🆕 CONTENT NOT AVAILABLE WIDGET (UPDATED WITH VISIBILITY CHECK)

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -162,29 +163,40 @@ class _AnimeShortsPageState extends State<AnimeShortsPage> {
             top: 50.h,
             left: 0,
             right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "OtaKuNexa",
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
+            child: ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "OtaKuNexa",
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(width: 15.w),
+                      Container(width: 1.w, height: 14.h, color: Colors.white24),
+                      SizedBox(width: 15.w),
+                      Text(
+                        "For You",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(width: 15.w),
-                Container(width: 1.w, height: 14.h, color: Colors.white24),
-                SizedBox(width: 15.w),
-                Text(
-                  "For You",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -530,6 +542,13 @@ class _ShortVideoItemState extends State<ShortVideoItem> {
         color: Colors.black87,
         shape: BoxShape.circle,
         border: Border.all(color: Colors.grey[800]!, width: 6.w),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purpleAccent.withOpacity(0.5),
+            blurRadius: 15.r,
+            spreadRadius: 2.r,
+          ),
+        ],
       ),
       child: CircleAvatar(
         radius: 14.r,
@@ -549,13 +568,25 @@ class _ShortVideoItemState extends State<ShortVideoItem> {
       onTap: onTap,
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 32.sp, // Slightly larger for better touch target
-            shadows: const [Shadow(blurRadius: 8, color: Colors.black54)],
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black.withOpacity(0.4),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 10.r,
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 28.sp,
+            ),
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 6.h),
           Text(
             label,
             style: TextStyle(

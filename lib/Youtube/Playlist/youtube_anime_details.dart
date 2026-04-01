@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -157,9 +158,9 @@ class _AnimeDetailsState extends State<YouTubeAnimeDetails> {
     return Container(
       padding: EdgeInsets.all(14.sp),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        color: const Color(0xFF1E1E1E).withOpacity(0.4),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Row(
         children: [
@@ -215,24 +216,27 @@ class _AnimeDetailsState extends State<YouTubeAnimeDetails> {
       backgroundColor: Colors.black,
       // Sticky bottom button (from code 2)
       bottomNavigationBar: _playlistItems.isNotEmpty
-          ? Container(
-              padding: EdgeInsets.fromLTRB(
-                20.w,
-                20.h,
-                20.w,
-                MediaQuery.of(context).padding.bottom + 20.h,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border(top: BorderSide(color: Colors.grey[900]!)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.8),
-                    offset: const Offset(0, -10),
-                    blurRadius: 20,
+          ? ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(
+                    20.w,
+                    20.h,
+                    20.w,
+                    MediaQuery.of(context).padding.bottom + 20.h,
                   ),
-                ],
-              ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1), width: 1.h)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF9D4EDD).withOpacity(0.05),
+                        offset: const Offset(0, -10),
+                        blurRadius: 20,
+                      ),
+                    ],
+                  ),
               child: ElevatedButton(
                 onPressed: _playFirstEpisode,
                 style: ElevatedButton.styleFrom(
@@ -264,7 +268,9 @@ class _AnimeDetailsState extends State<YouTubeAnimeDetails> {
                   ],
                 ),
               ),
-            )
+            ),
+            ),
+          )
           : null,
       body: CustomScrollView(
         controller: _scrollController,
@@ -353,11 +359,12 @@ class _AnimeDetailsState extends State<YouTubeAnimeDetails> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.black.withOpacity(0.2),
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.8),
+                          Colors.black.withOpacity(0.4),
+                          Colors.black.withOpacity(0.7),
+                          Colors.black.withOpacity(0.95),
                           Colors.black,
                         ],
-                        stops: const [0.0, 0.4, 0.8, 1.0],
+                        stops: const [0.0, 0.4, 0.7, 0.9, 1.0],
                       ),
                     ),
                   ),

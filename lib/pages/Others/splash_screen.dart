@@ -54,9 +54,9 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             )
           : Container(
-              color: Colors.transparent,
+              color: Colors.black,
               child: const Center(
-                child: Text('tatty phone', style: TextStyle(fontSize: 5)),
+                child: CircularProgressIndicator(color: Colors.deepPurpleAccent),
               ),
             ),
     );

@@ -1,6 +1,7 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Added Import
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:otakunexa/Reddit/service/reddit_service.dart';
 import 'package:otakunexa/pages/Others/share/share_service.dart';
@@ -97,8 +98,14 @@ class _CommunityPageState extends State<CommunityPage> {
       child: Scaffold(
         backgroundColor: AppTheme.bg,
         appBar: AppBar(
-          backgroundColor: AppTheme.cardSurface,
+          backgroundColor: AppTheme.cardSurface.withOpacity(0.8),
           elevation: 0,
+          flexibleSpace: ClipRRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(color: Colors.transparent),
+            ),
+          ),
           title: Container(
             height: 36.h,
             decoration: BoxDecoration(
@@ -145,7 +152,7 @@ class _CommunityPageState extends State<CommunityPage> {
                 controller: _scrollController,
                 itemCount: _posts.length + 1,
                 separatorBuilder: (c, i) =>
-                    Divider(height: 8.h, thickness: 8.h, color: AppTheme.bg),
+                    SizedBox(height: 4.h),
                 itemBuilder: (context, index) {
                   if (index == _posts.length) {
                     return _isLoadingMore
@@ -310,7 +317,19 @@ class _RedditStyleCardState extends State<_RedditStyleCard> {
         widget.post.thumbnail!.startsWith('http');
 
     return Container(
-      color: AppTheme.cardSurface,
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E).withOpacity(0.4),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
+          ),
+        ],
+      ),
       padding: EdgeInsets.symmetric(vertical: 12.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -681,9 +700,9 @@ class _RedditStyleCardState extends State<_RedditStyleCard> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: backgroundColor ?? Colors.transparent,
+        color: backgroundColor ?? Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: borderColor ?? Colors.grey[900]!),
+        border: Border.all(color: borderColor ?? Colors.transparent),
       ),
       child: child,
     );

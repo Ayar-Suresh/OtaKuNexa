@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -192,8 +193,14 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
         return Scaffold(
           backgroundColor: const Color(0xFF0A0A0A),
           appBar: AppBar(
-            backgroundColor: const Color(0xFF0A0A0A),
+            backgroundColor: Colors.black.withOpacity(0.6),
             elevation: 0,
+            flexibleSpace: ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
             leading: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
               onPressed: () => Navigator.pop(context),
@@ -237,7 +244,13 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
                       child: RepaintBoundary(
                         child: Container(
                           padding: EdgeInsets.all(16.w), // Responsive Padding
-                          color: const Color(0xFF0A0A0A),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E1E).withOpacity(0.4),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(16.r),
+                              bottomRight: Radius.circular(16.r),
+                            ),
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -398,8 +411,13 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
                           });
                         },
                         child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                           padding: EdgeInsets.all(16.w),
-                          color: const Color(0xFF0A0A0A),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E1E).withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(color: Colors.white.withOpacity(0.05)),
+                          ),
                           child: Row(
                             children: [
                               Icon(
@@ -589,8 +607,8 @@ class _PlaylistEpisodeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: isCurrentlyPlaying
-          ? const Color(0xFF9D4EDD).withOpacity(0.1)
-          : const Color(0xFF0A0A0A),
+          ? const Color(0xFF9D4EDD).withOpacity(0.15)
+          : Colors.transparent,
       child: InkWell(
         onTap: onTap,
         child: Container(

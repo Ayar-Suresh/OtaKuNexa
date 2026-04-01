@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -224,7 +225,23 @@ class _HomeScreenState extends State<HomeScreen>
       elevation: 0,
       centerTitle: false,
       titleSpacing: 0,
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: Colors.transparent,
+      flexibleSpace: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF0D0D0D).withOpacity(0.75),
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withOpacity(0.05),
+                  width: 1.h,
+                )
+              )
+            ),
+          ),
+        ),
+      ),
       leading: Builder(
         builder: (context) => IconButton(
           icon: Icon(Icons.menu, color: Colors.white, size: 24.sp),
@@ -384,22 +401,33 @@ class _HomeScreenState extends State<HomeScreen>
                   );
                 },
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.w),
+                  margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16.r),
+                    borderRadius: BorderRadius.circular(20.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF7B2CBF).withOpacity(0.25),
+                        blurRadius: 15.r,
+                        offset: Offset(0, 8.h),
+                      ),
+                    ],
                     gradient: LinearGradient(
                       colors: [
-                        const Color(0xFF7B2CBF).withOpacity(0.3),
-                        const Color(0xFF9D4EDD).withOpacity(0.1),
+                        const Color(0xFF7B2CBF).withOpacity(0.4),
+                        const Color(0xFF9D4EDD).withOpacity(0.15),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                      width: 1.w,
                     ),
                   ),
                   child: Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(16.r),
+                        borderRadius: BorderRadius.circular(20.r),
                         child: CachedNetworkImage(
                           imageUrl: video.thumbnail,
                           width: double.infinity,
@@ -420,13 +448,14 @@ class _HomeScreenState extends State<HomeScreen>
                           padding: EdgeInsets.all(16.w),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(16.r),
-                              bottomRight: Radius.circular(16.r),
+                              bottomLeft: Radius.circular(20.r),
+                              bottomRight: Radius.circular(20.r),
                             ),
                             gradient: LinearGradient(
                               colors: [
                                 Colors.transparent,
-                                Colors.black.withOpacity(0.7),
+                                Colors.black.withOpacity(0.8),
+                                Colors.black.withOpacity(0.95),
                               ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -693,18 +722,25 @@ class _HomeScreenState extends State<HomeScreen>
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
+          ),
+        ],
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF1A1A1A).withOpacity(0.3),
-            const Color(0xFF2A2A2A).withOpacity(0.1),
+            const Color(0xFF1A1A1A).withOpacity(0.6),
+            const Color(0xFF2A2A2A).withOpacity(0.3),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         border: Border.all(
-          color: const Color(0xFF9D4EDD).withOpacity(0.1),
-          width: 0.5.w,
+          color: Colors.white.withOpacity(0.08),
+          width: 1.w,
         ),
       ),
       child: Padding(
@@ -716,17 +752,17 @@ class _HomeScreenState extends State<HomeScreen>
               width: 150.w,
               height: 105.h,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withOpacity(0.4),
                     blurRadius: 8.r,
-                    offset: Offset(0, 4.h),
+                    offset: Offset(0, 3.h),
                   ),
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(12.r),
                 child: Stack(
                   children: [
                     Container(
@@ -1041,11 +1077,33 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: Colors.black, // Darken background for contrast
+      extendBodyBehindAppBar: true, // Enable glassmorphism overlap
       appBar: _buildAppBar(),
       drawer: const CustomDrawer(selectedPage: "Home"),
-      body: Column(
+      body: Stack(
         children: [
+          // Ambient Premium Glow Behind Content
+          Positioned(
+            top: -50.h,
+            right: -100.w,
+            child: Container(
+              width: 300.w,
+              height: 300.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF9D4EDD).withOpacity(0.15),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
           SmartSlidingTabs(
             initialIndex: 0,
             onChanged: (int value) {
@@ -1086,6 +1144,9 @@ class _HomeScreenState extends State<HomeScreen>
                   SizedBox(height: 24.h),
                 ],
               ),
+            ),
+          ),
+              ],
             ),
           ),
         ],

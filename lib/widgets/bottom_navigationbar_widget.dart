@@ -1,5 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Added ScreenUtil
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BottomNavigationbarWidget extends StatelessWidget {
   final int currentIndex; // Which tab is selected
@@ -13,60 +14,104 @@ class BottomNavigationbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Smartly calculate height: 60h + the device's bottom padding (safe area)
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return Container(
-      // Dynamic height to accommodate safe area
-      height: 60.h + bottomPadding,
-      // Push content up by the amount of bottom padding
-      padding: EdgeInsets.only(bottom: bottomPadding),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        border: Border(
-          top: BorderSide(
-            color: const Color(0xFF2A2A2A),
-            width: 1.h, // Responsive border width
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        child: Container(
+          height: 65.h + bottomPadding,
+          padding: EdgeInsets.only(bottom: bottomPadding),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F0F0F).withOpacity(0.65),
+            border: Border(
+              top: BorderSide(
+                color: Colors.white.withOpacity(0.08),
+                width: 1.h,
+              ),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.home_rounded, Icons.home_outlined, 'Home', 0),
+              _buildNavItem(Icons.play_circle_filled_sharp, Icons.play_circle_outline_sharp, 'Shorts', 1),
+              _buildNavItem(Icons.forum_rounded, Icons.forum_outlined, 'Community', 2),
+              _buildNavItem(Icons.account_circle, Icons.account_circle_outlined, 'Profile', 3),
+            ],
           ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(Icons.home, 'Home', 0),
-          _buildNavItem(Icons.play_circle_outline_sharp, 'Shorts', 1),
-          _buildNavItem(Icons.forum_outlined, 'Community', 2),
-          _buildNavItem(Icons.account_circle_outlined, 'Profile', 3),
-        ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(IconData activeIcon, IconData inactiveIcon, String label, int index) {
     final isSelected = index == currentIndex;
 
     return Expanded(
-      child: InkWell(
+      child: GestureDetector(
         onTap: () => onItemSelected(index),
-        splashColor: Colors.deepPurple.withOpacity(0.3),
-        highlightColor: Colors.transparent,
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 4.h), // Responsive padding
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutQuint,
+          padding: EdgeInsets.symmetric(vertical: 4.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: isSelected ? const Color(0xFF9D4EDD) : Colors.white60,
-                size: 22.sp, // Scalable pixel size for icon
+              // Animated Icon & Glow
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: EdgeInsets.all(isSelected ? 6.sp : 0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF9D4EDD).withOpacity(0.4),
+                            blurRadius: 10.r,
+                            spreadRadius: 2.r,
+                          )
+                        ]
+                      : [],
+                ),
+                child: Icon(
+                  isSelected ? activeIcon : inactiveIcon,
+                  color: isSelected ? const Color(0xFFE0AAFF) : Colors.white54,
+                  size: isSelected ? 24.sp : 22.sp,
+                ),
               ),
-              SizedBox(height: 3.h), // Responsive spacing
-              Text(
-                label,
+              SizedBox(height: 3.h),
+              
+              // Animated Text
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 300),
                 style: TextStyle(
-                  color: isSelected ? const Color(0xFF9D4EDD) : Colors.white60,
-                  fontSize: 11.5.sp, // Scalable pixel size for text
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: isSelected ? const Color(0xFFE0AAFF) : Colors.white54,
+                  fontSize: isSelected ? 11.5.sp : 10.5.sp,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  letterSpacing: isSelected ? 0.5 : 0.0,
+                ),
+                child: Text(label),
+              ),
+
+              // Glowing Underline Indicator
+              SizedBox(height: 2.h),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutQuint,
+                height: 3.h,
+                width: isSelected ? 20.w : 0,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE0AAFF),
+                  borderRadius: BorderRadius.circular(10.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFE0AAFF).withOpacity(0.8),
+                      blurRadius: 4.r,
+                      spreadRadius: 1.r,
+                    ),
+                  ],
                 ),
               ),
             ],

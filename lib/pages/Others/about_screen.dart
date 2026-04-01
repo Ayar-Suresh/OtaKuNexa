@@ -1,5 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Added
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,13 +42,19 @@ class _AboutPageState extends State<AboutPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(color: Colors.black.withOpacity(0.5)),
+          ),
+        ),
         title: Text(
           "About",
           style: TextStyle(color: Colors.white, fontSize: 20.sp),
         ),
         centerTitle: true,
-        elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
           onPressed: () => Navigator.pop(context),
@@ -113,8 +120,9 @@ class _AboutPageState extends State<AboutPage> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
               decoration: BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.circular(8.r),
+                color: const Color(0xFF1E1E1E).withOpacity(0.5),
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: Colors.white.withOpacity(0.05)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -161,8 +169,9 @@ class _AboutPageState extends State<AboutPage> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
               decoration: BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.circular(8.r),
+                color: const Color(0xFF1E1E1E).withOpacity(0.5),
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: Colors.white.withOpacity(0.05)),
               ),
               child: Text(
                 "Follow Us",
@@ -213,9 +222,19 @@ class _AboutPageState extends State<AboutPage> {
   Widget _socialIcon(IconData icon, String url) {
     return InkWell(
       onTap: () => _launchURL(url),
-      child: CircleAvatar(
-        radius: 20.r,
-        backgroundColor: Colors.white10,
+      child: Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0xFF1E1E1E).withOpacity(0.5),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.deepPurpleAccent.withOpacity(0.2),
+              blurRadius: 10.r,
+            ),
+          ],
+        ),
         child: Icon(icon, color: Colors.white, size: 20.sp),
       ),
     );
